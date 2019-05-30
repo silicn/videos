@@ -14,7 +14,6 @@
 #define kScreenHeight [UIScreen mainScreen].bounds.size.height
 
 
-
 @interface ImagePickViewController ()<AVCapturePhotoCaptureDelegate>
 
 @property (nonatomic , strong)AVCaptureSession *session;
@@ -25,7 +24,7 @@
 
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer* previewLayer;
 
-@property (nonatomic, strong) AVCapturePhotoOutput* photoOutput;
+@property (nonatomic, strong) AVCapturePhotoOutput * photoOutput;
 
 @property (nonatomic ,strong) AVCaptureStillImageOutput *stillImageOutput;
 
@@ -44,7 +43,6 @@
     
     self.session = [[AVCaptureSession alloc]init];
     self.session.sessionPreset = AVCaptureSessionPresetPhoto;
-    
     
     self.device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     NSError *error;
@@ -124,10 +122,13 @@
     
     [self.session startRunning];
     
-    if ([_device lockForConfiguration:nil]) {
-        if ([_device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
-        }
+    [_device lockForConfiguration:nil];
+    
+    if ([_device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
+        _device.focusMode = AVCaptureFlashModeAuto;
     }
+    [_device unlockForConfiguration];
+    
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
     
@@ -196,11 +197,14 @@
 
 
 - (void)captureOutput:(AVCapturePhotoOutput *)captureOutput didFinishProcessingPhotoSampleBuffer:(nullable CMSampleBufferRef)photoSampleBuffer previewPhotoSampleBuffer:(nullable CMSampleBufferRef)previewPhotoSampleBuffer resolvedSettings:(AVCaptureResolvedPhotoSettings *)resolvedSettings bracketSettings:(nullable AVCaptureBracketedStillImageSettings *)bracketSettings error:(nullable NSError *)error  API_AVAILABLE(ios(10.0)){
-    
     NSData *data = [AVCapturePhotoOutput JPEGPhotoDataRepresentationForJPEGSampleBuffer:photoSampleBuffer previewPhotoSampleBuffer:previewPhotoSampleBuffer];
     UIImage *image = [UIImage imageWithData:data];
     
-    self.showImageView.image= image;
+    NSLog(@"%@",NSStringFromCGSize(image.size));
+    
+    UIImage *squareImage = [self cropSquareImage:image];
+    
+    self.showImageView.image= squareImage;
     self.showImageView.hidden = NO;
     [self performSelector:@selector(dismiss) withObject:nil afterDelay:5.0];
 }
@@ -237,6 +241,9 @@
 
 -(UIImage *)cropSquareImage:(UIImage *)image{
     
+    
+    image = [self fixOrientationWithImage:image];
+    
     CGImageRef sourceImageRef = [image CGImage];//将UIImage转换成CGImageRef
     
     CGFloat _imageWidth = image.size.width * image.scale;
@@ -248,8 +255,76 @@
     CGRect rect = CGRectMake(_offsetX, _offsetY, _width, _width);
     CGImageRef newImageRef = CGImageCreateWithImageInRect(sourceImageRef, rect);//按照给定的矩形区域进行剪裁
     UIImage *newImage = [UIImage imageWithCGImage:newImageRef];
-
+    NSLog(@"new = %@   %d",NSStringFromCGSize(newImage.size),newImage.imageOrientation);
     return newImage;
+}
+
+- (UIImage *)fixOrientationWithImage:(UIImage *)image
+{
+    if (image.imageOrientation == UIImageOrientationUp)
+        return image;
+    
+    CGAffineTransform transform = CGAffineTransformIdentity;
+    
+    switch (image.imageOrientation) {
+        case UIImageOrientationDown:
+        case UIImageOrientationDownMirrored:
+            transform = CGAffineTransformTranslate(transform, image.size.width, image.size.height);
+            transform = CGAffineTransformRotate(transform, M_PI);
+            break;
+            
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+            transform = CGAffineTransformTranslate(transform, image.size.width, 0);
+            transform = CGAffineTransformRotate(transform, M_PI_2);
+            break;
+            
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            transform = CGAffineTransformTranslate(transform, 0, image.size.height);
+            transform = CGAffineTransformRotate(transform, -M_PI_2);
+            break;
+        default:
+            break;
+    }
+    
+    switch (image.imageOrientation) {
+        case UIImageOrientationUpMirrored:
+        case UIImageOrientationDownMirrored:
+            transform = CGAffineTransformTranslate(transform, image.size.width, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+            
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRightMirrored:
+            transform = CGAffineTransformTranslate(transform, image.size.height, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+        default:
+            break;
+    }
+    
+    CGContextRef ctx = CGBitmapContextCreate(NULL, image.size.width, image.size.height,
+                                             CGImageGetBitsPerComponent(image.CGImage), 0,
+                                             CGImageGetColorSpace(image.CGImage),
+                                             CGImageGetBitmapInfo(image.CGImage));
+    CGContextConcatCTM(ctx, transform);
+    switch (image.imageOrientation) {
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            CGContextDrawImage(ctx, CGRectMake(0,0,image.size.height,image.size.width), image.CGImage);
+            break;
+        default:
+            CGContextDrawImage(ctx, CGRectMake(0,0,image.size.width,image.size.height), image.CGImage);
+            break;
+    }
+    CGImageRef cgimg = CGBitmapContextCreateImage(ctx);
+    UIImage *img = [UIImage imageWithCGImage:cgimg];
+    CGContextRelease(ctx);
+    CGImageRelease(cgimg);
+    return img;
 }
 
 /*
