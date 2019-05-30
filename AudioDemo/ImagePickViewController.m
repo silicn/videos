@@ -13,7 +13,9 @@
 
 #define kScreenHeight [UIScreen mainScreen].bounds.size.height
 
-@interface ImagePickViewController ()
+
+
+@interface ImagePickViewController ()<AVCapturePhotoCaptureDelegate>
 
 @property (nonatomic , strong)AVCaptureSession *session;
 
@@ -51,17 +53,33 @@
         
     }
     
-    self.stillImageOutput = [[AVCaptureStillImageOutput alloc]init];
-    NSDictionary * outputSettings = [[NSDictionary alloc] initWithObjectsAndKeys:AVVideoCodecJPEG,AVVideoCodecKey, nil];
-    [self.stillImageOutput setOutputSettings:outputSettings];
+    if (@available(iOS 10,*)) {
+        self.photoOutput = [AVCapturePhotoOutput new];
+        NSDictionary *setDic = @{AVVideoCodecKey:AVVideoCodecJPEG};
+        AVCapturePhotoSettings *settings = [AVCapturePhotoSettings photoSettingsWithFormat:setDic];
+        [self.photoOutput setPhotoSettingsForSceneMonitoring:settings];
+//        [self.photoOutput capturePhotoWithSettings:settings delegate:self];
+    }else{
+        self.stillImageOutput = [[AVCaptureStillImageOutput alloc]init];
+        NSDictionary * outputSettings = [[NSDictionary alloc] initWithObjectsAndKeys:AVVideoCodecJPEG,AVVideoCodecKey, nil];
+        [self.stillImageOutput setOutputSettings:outputSettings];
+    }
     
     if ([self.session canAddInput:self.videoInput]) {
         [self.session addInput:self.videoInput];
     }
 
-    if ([self.session canAddOutput:self.stillImageOutput]) {
-        [self.session addOutput:self.stillImageOutput];
+    if (@available(iOS 10,*)) {
+        if ([self.session canAddOutput:self.photoOutput]) {
+            [self.session addOutput:self.photoOutput];
+        }
+    }else{
+        if ([self.session canAddOutput:self.stillImageOutput]) {
+            [self.session addOutput:self.stillImageOutput];
+        }
     }
+    
+    
     
     self.previewLayer = [[AVCaptureVideoPreviewLayer alloc]initWithSession:self.session];
     
@@ -176,21 +194,37 @@
 
 }
 
+
+- (void)captureOutput:(AVCapturePhotoOutput *)captureOutput didFinishProcessingPhotoSampleBuffer:(nullable CMSampleBufferRef)photoSampleBuffer previewPhotoSampleBuffer:(nullable CMSampleBufferRef)previewPhotoSampleBuffer resolvedSettings:(AVCaptureResolvedPhotoSettings *)resolvedSettings bracketSettings:(nullable AVCaptureBracketedStillImageSettings *)bracketSettings error:(nullable NSError *)error  API_AVAILABLE(ios(10.0)){
+    
+    NSData *data = [AVCapturePhotoOutput JPEGPhotoDataRepresentationForJPEGSampleBuffer:photoSampleBuffer previewPhotoSampleBuffer:previewPhotoSampleBuffer];
+    UIImage *image = [UIImage imageWithData:data];
+    
+    self.showImageView.image= image;
+    self.showImageView.hidden = NO;
+    [self performSelector:@selector(dismiss) withObject:nil afterDelay:5.0];
+}
+
 - (void)photo {
     
     AVCaptureConnection *connection = [self.stillImageOutput connectionWithMediaType:AVMediaTypeVideo];
     [connection setVideoOrientation:AVCaptureVideoOrientationPortrait];
-    [self.stillImageOutput captureStillImageAsynchronouslyFromConnection:connection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
-        NSData *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-        UIImage *image = [UIImage imageWithData:jpegData];
-        
-//        UIImage *shortImage = [self cropSquareImage:image];
-        self.showImageView.hidden = NO;
-        self.showImageView.image = image;
-        
-        [self performSelector:@selector(dismiss) withObject:nil afterDelay:5.0];
-        
-    }];
+    
+    if (@available(iOS 10,*)) {
+        NSDictionary *setDic = @{AVVideoCodecKey:AVVideoCodecJPEG};
+        AVCapturePhotoSettings *settings = [AVCapturePhotoSettings photoSettingsWithFormat:setDic];
+        [self.photoOutput capturePhotoWithSettings:settings delegate:self];
+    }else{
+        [self.stillImageOutput captureStillImageAsynchronouslyFromConnection:connection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
+            NSData *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+            UIImage *image = [UIImage imageWithData:jpegData];
+            self.showImageView.hidden = NO;
+            self.showImageView.image = image;
+
+            [self performSelector:@selector(dismiss) withObject:nil afterDelay:5.0];
+
+        }];
+    }
     
 }
 
@@ -215,7 +249,6 @@
     CGImageRef newImageRef = CGImageCreateWithImageInRect(sourceImageRef, rect);//按照给定的矩形区域进行剪裁
     UIImage *newImage = [UIImage imageWithCGImage:newImageRef];
 
-    
     return newImage;
 }
 

@@ -16,6 +16,9 @@
 
 #import "ImagePickViewController.h"
 
+#import <objc/message.h>
+
+
 
 
 @interface ViewController ()
@@ -73,7 +76,17 @@
     [btn addTarget:self action:@selector(openCamer) forControlEvents:UIControlEventTouchUpInside];
     
     
+    NSArray *a1 = [NSArray array];
     
+    NSLog(@"%s",object_getClassName(a1));
+    
+    NSArray *a2 = [NSArray arrayWithObjects:@"0", nil];
+    
+     NSLog(@"%s",object_getClassName(a2));
+    
+    NSArray *a3 = [NSArray arrayWithObjects:@"0",@"1", nil];
+    
+    NSLog(@"%s",object_getClassName(a3));
     
     
     
