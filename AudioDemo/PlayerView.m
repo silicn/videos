@@ -88,12 +88,16 @@
 
 - (void)pauseOrplay
 {
-    if (self.player.timeControlStatus == AVPlayerTimeControlStatusPaused) {
-        [self.player play];
-    }else if (self.player.timeControlStatus == AVPlayerTimeControlStatusPlaying){
-        [self.player pause];
-    }else if (self.player.timeControlStatus == AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate){
-        [self.player play];
+    if (@available(iOS 10.0, *)) {
+        if (self.player.timeControlStatus == AVPlayerTimeControlStatusPaused) {
+            [self.player play];
+        }else if (self.player.timeControlStatus == AVPlayerTimeControlStatusPlaying){
+            [self.player pause];
+        }else if (self.player.timeControlStatus == AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate){
+            [self.player play];
+        }
+    } else {
+        // Fallback on earlier versions
     }
 }
 

@@ -168,6 +168,16 @@
     // Do any additional setup after loading the view from its nib.
 }
 
+- (BOOL)checkPersmission{
+    AVAuthorizationStatus status  = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if (status == AVAuthorizationStatusDenied) {
+        NSLog(@"相机权限没有获取到");
+        return NO;
+    }else{
+        return YES;
+    }
+}
+
 - (void)switchPhoto
 {
     AVCaptureDevicePosition desiredPosition;
@@ -194,6 +204,29 @@
 
 
 }
+
+- (void)focusAtPoint:(CGPoint)point{
+    CGSize size = self.view.bounds.size;
+    CGPoint focusPoint = CGPointMake( point.y /size.height ,1-point.x/size.width );
+    NSError *error;
+    if ([self.device lockForConfiguration:&error]) {
+        //对焦模式和对焦点
+        if ([self.device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
+            [self.device setFocusPointOfInterest:focusPoint];
+            [self.device setFocusMode:AVCaptureFocusModeAutoFocus];
+        }
+        //曝光模式和曝光点
+        if ([self.device isExposureModeSupported:AVCaptureExposureModeAutoExpose ]) {
+            [self.device setExposurePointOfInterest:focusPoint];
+            [self.device setExposureMode:AVCaptureExposureModeAutoExpose];
+        }
+        
+        [self.device unlockForConfiguration];
+        //设置对焦动画
+    }
+    
+}
+
 
 
 - (void)captureOutput:(AVCapturePhotoOutput *)captureOutput didFinishProcessingPhotoSampleBuffer:(nullable CMSampleBufferRef)photoSampleBuffer previewPhotoSampleBuffer:(nullable CMSampleBufferRef)previewPhotoSampleBuffer resolvedSettings:(AVCaptureResolvedPhotoSettings *)resolvedSettings bracketSettings:(nullable AVCaptureBracketedStillImageSettings *)bracketSettings error:(nullable NSError *)error  API_AVAILABLE(ios(10.0)){

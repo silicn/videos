@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		460BB7BB229E232500DB7A5E /* ImagePickViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 460BB7B9229E232500DB7A5E /* ImagePickViewController.m */; };
 		460BB7BC229E232500DB7A5E /* ImagePickViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 460BB7BA229E232500DB7A5E /* ImagePickViewController.xib */; };
+		460BB7C0229FD41800DB7A5E /* NSArray+Safey.m in Sources */ = {isa = PBXBuildFile; fileRef = 460BB7BF229FD41800DB7A5E /* NSArray+Safey.m */; };
 		467FA1F3229D17CF00E80C89 /* PlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 467FA1F2229D17CF00E80C89 /* PlayerView.m */; };
 		46D0C09F229BB944002A86F2 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 46D0C09E229BB944002A86F2 /* AppDelegate.m */; };
 		46D0C0A2229BB944002A86F2 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 46D0C0A1229BB944002A86F2 /* ViewController.m */; };
@@ -25,6 +26,8 @@
 		460BB7B8229E232500DB7A5E /* ImagePickViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImagePickViewController.h; sourceTree = "<group>"; };
 		460BB7B9229E232500DB7A5E /* ImagePickViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ImagePickViewController.m; sourceTree = "<group>"; };
 		460BB7BA229E232500DB7A5E /* ImagePickViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImagePickViewController.xib; sourceTree = "<group>"; };
+		460BB7BE229FD41800DB7A5E /* NSArray+Safey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+Safey.h"; sourceTree = "<group>"; };
+		460BB7BF229FD41800DB7A5E /* NSArray+Safey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSArray+Safey.m"; sourceTree = "<group>"; };
 		467FA1F1229D17CF00E80C89 /* PlayerView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayerView.h; sourceTree = "<group>"; };
 		467FA1F2229D17CF00E80C89 /* PlayerView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlayerView.m; sourceTree = "<group>"; };
 		46D0C09A229BB944002A86F2 /* AudioDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -82,6 +85,8 @@
 				46D0C0B6229BEB3D002A86F2 /* Person.m */,
 				46D0C0B8229BEB4D002A86F2 /* Student.h */,
 				46D0C0B9229BEB4D002A86F2 /* Student.m */,
+				460BB7BE229FD41800DB7A5E /* NSArray+Safey.h */,
+				460BB7BF229FD41800DB7A5E /* NSArray+Safey.m */,
 				467FA1F1229D17CF00E80C89 /* PlayerView.h */,
 				467FA1F2229D17CF00E80C89 /* PlayerView.m */,
 				460BB7B8229E232500DB7A5E /* ImagePickViewController.h */,
@@ -174,6 +179,7 @@
 				46D0C0AD229BB948002A86F2 /* main.m in Sources */,
 				460BB7BB229E232500DB7A5E /* ImagePickViewController.m in Sources */,
 				46D0C0BA229BEB4D002A86F2 /* Student.m in Sources */,
+				460BB7C0229FD41800DB7A5E /* NSArray+Safey.m in Sources */,
 				46D0C0B7229BEB3D002A86F2 /* Person.m in Sources */,
 				46D0C09F229BB944002A86F2 /* AppDelegate.m in Sources */,
 			);

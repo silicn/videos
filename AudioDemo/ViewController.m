@@ -18,8 +18,7 @@
 
 #import <objc/message.h>
 
-
-
+#import "NSArray+Safey.h"
 
 @interface ViewController ()
 
@@ -55,16 +54,16 @@
 //    
 //    [self.player play];
     
-    self.play = [[PlayerView alloc]initWithFrame:CGRectMake(0, 30, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * 9/16)];
-    self.play.url = url;
-    
-    [self.view addSubview:self.play];
+//    self.play = [[PlayerView alloc]initWithFrame:CGRectMake(0, 30, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * 9/16)];
+//    self.play.url = url;
+//    
+//    [self.view addSubview:self.play];
     
 //    [self.play play];
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
     
-    [btn setTitle:@"开启" forState:UIControlStateNormal];
+    [btn setTitle:@"开启摄像头" forState:UIControlStateNormal];
     
     
     btn.frame = CGRectMake(0, 0, 100, 30);
@@ -87,6 +86,8 @@
     NSArray *a3 = [NSArray arrayWithObjects:@"0",@"1", nil];
     
     NSLog(@"%s",object_getClassName(a3));
+    
+    NSString *str = [a3 objectAtIndex:3];
     
     
     
