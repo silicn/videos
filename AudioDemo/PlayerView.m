@@ -104,7 +104,6 @@
 - (void)setUrl:(NSURL *)url
 {
     _url = url;
-    
     if (self.player) {
         AVPlayerItem *item = [[AVPlayerItem alloc]initWithURL:url];
         [self.player replaceCurrentItemWithPlayerItem:item];
