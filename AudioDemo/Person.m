@@ -8,12 +8,26 @@
 
 #import "Person.h"
 
+
 @implementation Person
+
+@synthesize name = _name;
 
 - (Class)class
 {
     NSLog(@"Person");
     return [super class];
+}
+
+
+- (NSString *)name
+{
+    return _name;
+}
+
+- (void)setName:(NSString *)name
+{
+    _name = name;
 }
 
 @end
