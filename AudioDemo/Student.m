@@ -8,14 +8,16 @@
 
 #import "Student.h"
 
-@implementation Student
+@implementation Student{
+    NSString *_sex;
+}
 
 - (instancetype)init
 {
     self = [super init];
     if (self) {
         NSLog(@"%@",[super class]);
-        
+        _sex = @"男";
     }
     return self;
 }
